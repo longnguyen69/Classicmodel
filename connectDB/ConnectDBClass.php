@@ -1,5 +1,5 @@
 <?php
-include 'config.php';
+//include 'config.php';
 
 class ConnectDBClass
 {
@@ -14,7 +14,7 @@ class ConnectDBClass
     public function connectDB(){
         $conn = null;
         try {
-            $conn = new PDO("mysql:host=localhost;dbname=classicmodels",$this->userName,$this->password);
+            $conn = new PDO("mysql:host=localhost;dbname=librarymanager",$this->userName,$this->password);
         } catch (PDOException $exception){
             return $exception->getMessage();
         }

@@ -1,12 +1,16 @@
 <?php
 session_start();
-if (!isset($_SESSION['user'])) {
+if (!isset($_SESSION['user'])){
     header('location: ../login/login.php');
 }
-include '../class/Manipulation.php';
-$book = new Manipulation();
-$books = $book->getListBooks();
 
+include "../connectDB/config.php";
+include "../connectDB/ConnectDBClass.php";
+include "../class/Manipulation.php";
+$book = new Manipulation();
+
+$categoriesID = $book->showCategories();
+$status = $book->getStatus();
 
 ?>
 <!doctype html>
@@ -16,9 +20,9 @@ $books = $book->getListBooks();
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Quan ly sinh vien</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>Document</title>
 </head>
 <body>
 <div class="container">
@@ -35,7 +39,7 @@ $books = $book->getListBooks();
             </li>
             <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
-                        data-toggle="dropdown">
+                        data-toggle="dropdown" >
                     <?php echo $_SESSION['user'] ?>
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -48,50 +52,48 @@ $books = $book->getListBooks();
             </li>
         </ul>
     </div>
-    <div class="card">
-        <div class="card-header">
-            List Books
-        </div>
-        <form method="post">
-            <div class="card-body">
-                <table class="table">
-                    <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">STT</th>
-                        <th scope="col">Book Name</th>
-                        <th scope="col">Author</th>
-                        <th scope="col">Version</th>
-                        <th scope="col">Image</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php foreach ($books as $key => $values): ?>
-                        <tr>
-                            <th><?php echo ++$key ?></th>
-                            <td><?php echo $values['name'] ?></td>
-                            <td><?php echo $values['author'] ?></td>
-                            <td><?php echo $values['version_number'] ?></td>
-                            <td><img src="../uploads/<?php echo $values['image'] ?>" width="80px"></td>
-
-                            <td>
-                                <?php if ($values['status'] == 1): ?>
-                                    <p class="text-success">Con sach</p>
-                                <?php else: ?>
-                                    <p class="text-danger">Het sach</p>
-                                <?php endif; ?>
-                            </td>
-
-                            <td>
-                                <a href="update.php?code=<?php echo $values['code'] ?> ">Update</a>
-                                <a onclick="return confirm('You definitely want to delete?')" href="../action/delete.php?code=<?php echo $values['code'] ?>">Delete</a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
+</div>
+<div class="container">
+    <div class="col-8">
+        <form method="post" action="../action/addBook.php" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Book Name </label>
+                <input type="text" class="form-control" name="name">
             </div>
+            <div class="form-group">
+                <label>Author</label>
+                <input type="text" class="form-control" name="author">
+            </div>
+            <div class="form-group">
+                <label>Publish</label>
+                <input type="date" class="form-control" name="date">
+            </div>
+            <div class="form-group">
+                <label>Version</label>
+                <input type="text" class="form-control" name="version">
+            </div>
+            <div class="form-group">
+                <label>Price</label>
+                <input type="text" class="form-control" name="price">
+            </div>
+            <div class="form-group">
+                <label>Categories</label>
+                <select class="custom-select" name="categoryID">
+                    <?php foreach ($categoriesID as $key):?>
+                    <option value="<?php echo $key['id']?>"><?php echo $key['name'] ?></option>
+                    <?php endforeach;?>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="radio"  value="1" checked name="status"> con hang
+                <input type="radio" value="0" name="status"> het hang
+            </div>
+            <div class="form-group">
+                <label>Image</label>
+                <input type="file" class="form-control" name="image">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create</button>
         </form>
     </div>
 </div>
